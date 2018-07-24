@@ -281,19 +281,19 @@ bool ExpressionCompiler::visit(TupleExpression const& _tuple)
 	if (_tuple.isInlineArray())
 	{
 		ArrayType const& arrayType = dynamic_cast<ArrayType const&>(*_tuple.annotation().type);
-		
+
 		solAssert(!arrayType.isDynamicallySized(), "Cannot create dynamically sized inline array.");
 		m_context << max(u256(32u), arrayType.memorySize());
 		utils().allocateMemory();
 		m_context << Instruction::DUP1;
-	
+
 		for (auto const& component: _tuple.components())
 		{
 			component->accept(*this);
 			utils().convertType(*component->annotation().type, *arrayType.baseType(), true);
-			utils().storeInMemoryDynamic(*arrayType.baseType(), true);				
+			utils().storeInMemoryDynamic(*arrayType.baseType(), true);
 		}
-		
+
 		m_context << Instruction::POP;
 	}
 	else
@@ -1526,13 +1526,24 @@ void ExpressionCompiler::endVisit(Identifier const& _identifier)
 	{
 		solAssert(false, "Identifier type not expected in expression context.");
 	}
+
+	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
+	{
+		if (intType->isAddress())
+		{
+			if (!_identifier.annotation().lValueRequested) {
+				std::cout << "Address found: " << _identifier.name() << ", " << m_context.assembly().items().size()
+				                                                             << std::endl;
+			}
+		}
+	}
 }
 
 void ExpressionCompiler::endVisit(Literal const& _literal)
 {
 	CompilerContext::LocationSetter locationSetter(m_context, _literal);
 	TypePointer type = _literal.annotation().type;
-	
+
 	switch (type->category())
 	{
 	case Type::Category::RationalNumber:
