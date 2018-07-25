@@ -1,10 +1,19 @@
-FROM alpine AS build
-MAINTAINER chriseth <chris@ethereum.org>
+FROM ubuntu:16.04
+MAINTAINER Leo Li <leeleo3x@gmail.com>
 #Official solidity docker image
 
 #Establish working directory as solidity
 WORKDIR /solidity
 
+RUN apt-get -y update && \
+	DEBIAN_FRONTEND=noninteractive apt-get -y install python-pip git && \
+	git clone https://github.com/Leeleo3x/manticore.git && \
+	cd manticore && \
+	pip install .
+RUN apt-get install -y build-essential software-properties-common && \
+  add-apt-repository -y ppa:ethereum/ethereum && \
+  apt-get update && \
+  apt-get install -y ethereum sudo
 # Build dependencies
 ADD /scripts/install_deps.sh /solidity/scripts/install_deps.sh
 RUN ./scripts/install_deps.sh
@@ -32,8 +41,6 @@ RUN make solc \
             }                                              \
         }                                                  \
     }")
-RUN strip solc/solc
+RUN make install
 
-FROM scratch
-COPY --from=build /solidity/solc/solc /usr/bin/solc
-ENTRYPOINT ["/usr/bin/solc"]
+CMD ["/bin/bash"]
