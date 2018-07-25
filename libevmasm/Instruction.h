@@ -194,6 +194,7 @@ enum class Instruction: uint8_t
 	DELEGATECALL,		///< like CALLCODE but keeps caller's value and sender
 	STATICCALL = 0xfa,	///< like CALL but disallow state modifications
 	CREATE2 = 0xfb,		///< create new account with associated code at address `sha3(sender + salt + sha3(init code)) % 2**160`
+	ADDR = 0xfc,        ///< custom instruction that indicates current stack top is an address.>
 
 	REVERT = 0xfd,		///< halt execution, revert state and return output data
 	INVALID = 0xfe,		///< invalid instruction for expressing runtime errors (e.g., division-by-zero)
