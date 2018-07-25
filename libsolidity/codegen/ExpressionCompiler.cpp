@@ -1527,16 +1527,15 @@ void ExpressionCompiler::endVisit(Identifier const& _identifier)
 		solAssert(false, "Identifier type not expected in expression context.");
 	}
 
-	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
-	{
-		if (intType->isAddress())
-		{
-			if (!_identifier.annotation().lValueRequested) {
-				std::cout << "Address found: " << _identifier.name() << ", " << m_context.assembly().items().size()
-				                                                             << std::endl;
-			}
-		}
-	}
+//	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
+//	{
+//		if (intType->isAddress())
+//		{
+//			if (!_identifier.annotation().lValueRequested) {
+////				m_context << Instruction::ADDR;
+//			}
+//		}
+//	}
 }
 
 void ExpressionCompiler::endVisit(Literal const& _literal)
