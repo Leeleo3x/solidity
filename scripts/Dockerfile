@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine AS build
 MAINTAINER chriseth <chris@ethereum.org>
 #Official solidity docker image
 
@@ -15,4 +15,3 @@ cd / && rm -rf solidity &&\
 apk del sed build-base git make cmake gcc g++ musl-dev curl-dev boost-dev &&\
 rm -rf /var/cache/apk/*
 
-ENTRYPOINT ["/usr/bin/solc"]
