@@ -312,7 +312,7 @@ static const std::map<Instruction, InstructionInfo> c_instructionInfo =
 	{ Instruction::CREATE2,		{ "CREATE2",		0, 4, 1, true, Tier::Special } },
 	{ Instruction::REVERT,		{ "REVERT",		0, 2, 0, true, Tier::Zero } },
 	{ Instruction::INVALID,		{ "INVALID",		0, 0, 0, true, Tier::Zero } },
-	{ Instruction::ADDR,		{ "ADDR",		0, 0, 0, false, Tier::Zero } },
+	{ Instruction::ADDR,		{ "ADDR",		0, 1, 1, false, Tier::Zero } },
 	{ Instruction::SELFDESTRUCT,	{ "SELFDESTRUCT",		0, 1, 0, true, Tier::Special } }
 };
 

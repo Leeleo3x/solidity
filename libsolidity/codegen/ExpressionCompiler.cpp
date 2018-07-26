@@ -1527,15 +1527,15 @@ void ExpressionCompiler::endVisit(Identifier const& _identifier)
 		solAssert(false, "Identifier type not expected in expression context.");
 	}
 
-//	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
-//	{
-//		if (intType->isAddress())
-//		{
-//			if (!_identifier.annotation().lValueRequested) {
-////				m_context << Instruction::ADDR;
-//			}
-//		}
-//	}
+	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
+	{
+		if (intType->isAddress())
+		{
+			if (!_identifier.annotation().lValueRequested) {
+				m_context << Instruction::ADDR;
+			}
+		}
+	}
 }
 
 void ExpressionCompiler::endVisit(Literal const& _literal)
@@ -1554,6 +1554,13 @@ void ExpressionCompiler::endVisit(Literal const& _literal)
 		break; // will be done during conversion
 	default:
 		solUnimplemented("Only integer, boolean and string literals implemented for now.");
+	}
+	if (auto intType = dynamic_pointer_cast<IntegerType const>(type))
+	{
+		if (intType->isAddress())
+		{
+			m_context << Instruction::ADDR;
+		}
 	}
 }
 
