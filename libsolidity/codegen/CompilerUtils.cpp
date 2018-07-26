@@ -1035,6 +1035,14 @@ void CompilerUtils::convertType(
 
 	solAssert(!enumOverflowCheckPending, "enum overflow checking missing.");
 	solAssert(!chopSignBitsPending, "forgot to chop the sign bits.");
+
+	if (auto intType = dynamic_cast<IntegerType const*>(&_targetType))
+	{
+		if (intType->isAddress())
+		{
+			m_context << Instruction::ADDR;
+		}
+	}
 }
 
 void CompilerUtils::pushZeroValue(Type const& _type)
