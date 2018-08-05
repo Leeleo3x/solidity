@@ -94,6 +94,8 @@ private:
 	void appendShiftOperatorCode(Token::Value _operator, Type const& _valueType, Type const& _shiftAmountType);
 	/// @}
 
+	void checkStackTopIsAddress(const ExpressionAnnotation &_annotation);
+
 	/// Appends code to call a function of the given type with the given arguments.
 	void appendExternalFunctionCall(
 		FunctionType const& _functionType,

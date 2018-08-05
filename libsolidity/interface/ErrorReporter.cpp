@@ -69,7 +69,7 @@ void ErrorReporter::error(Error::Type _type, SourceLocation const& _location, st
 		errinfo_sourceLocation(_location) <<
 		errinfo_comment(_description);
 
-	m_errorList.push_back(err);
+//	m_errorList.push_back(err);
 }
 
 void ErrorReporter::error(Error::Type _type, SourceLocation const& _location, SecondarySourceLocation const& _secondaryLocation, string const& _description)
@@ -83,7 +83,7 @@ void ErrorReporter::error(Error::Type _type, SourceLocation const& _location, Se
 		errinfo_secondarySourceLocation(_secondaryLocation) <<
 		errinfo_comment(_description);
 
-	m_errorList.push_back(err);
+//	m_errorList.push_back(err);
 }
 
 bool ErrorReporter::checkForExcessiveErrors(Error::Type _type)
