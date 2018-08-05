@@ -186,6 +186,20 @@ void ExpressionCompiler::appendStateVariableAccessor(VariableDeclaration const& 
 	m_context.appendJump(eth::AssemblyItem::JumpType::OutOfFunction);
 }
 
+
+void ExpressionCompiler::checkStackTopIsAddress(const dev::solidity::ExpressionAnnotation &_annotation)
+{
+	if (auto intType = dynamic_pointer_cast<IntegerType const>(_annotation.type))
+	{
+		if (intType->isAddress())
+		{
+			if (!_annotation.lValueRequested) {
+				m_context << Instruction::ADDR;
+			}
+		}
+	}
+}
+
 bool ExpressionCompiler::visit(Conditional const& _condition)
 {
 	CompilerContext::LocationSetter locationSetter(m_context, _condition);
@@ -319,6 +333,7 @@ bool ExpressionCompiler::visit(TupleExpression const& _tuple)
 				m_currentLValue.reset(new TupleObject(m_context, move(lvalues)));
 		}
 	}
+	checkStackTopIsAddress(_tuple.annotation());
 	return false;
 }
 
@@ -1052,6 +1067,7 @@ bool ExpressionCompiler::visit(FunctionCall const& _functionCall)
 			solAssert(false, "Invalid function type.");
 		}
 	}
+	checkStackTopIsAddress(_functionCall.annotation());
 	return false;
 }
 
@@ -1472,6 +1488,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 	}
 	else
 		solAssert(false, "Index access only allowed for mappings or arrays.");
+	checkStackTopIsAddress(_indexAccess.annotation());
 
 	return false;
 }
@@ -1527,15 +1544,7 @@ void ExpressionCompiler::endVisit(Identifier const& _identifier)
 		solAssert(false, "Identifier type not expected in expression context.");
 	}
 
-	if (auto intType = dynamic_pointer_cast<IntegerType const>(declaration->type()))
-	{
-		if (intType->isAddress())
-		{
-			if (!_identifier.annotation().lValueRequested) {
-				m_context << Instruction::ADDR;
-			}
-		}
-	}
+	checkStackTopIsAddress(_identifier.annotation());
 }
 
 void ExpressionCompiler::endVisit(Literal const& _literal)
@@ -1555,13 +1564,7 @@ void ExpressionCompiler::endVisit(Literal const& _literal)
 	default:
 		solUnimplemented("Only integer, boolean and string literals implemented for now.");
 	}
-	if (auto intType = dynamic_pointer_cast<IntegerType const>(type))
-	{
-		if (intType->isAddress())
-		{
-			m_context << Instruction::ADDR;
-		}
-	}
+	checkStackTopIsAddress(_literal.annotation());
 }
 
 void ExpressionCompiler::appendAndOrOperatorCode(BinaryOperation const& _binaryOperation)
