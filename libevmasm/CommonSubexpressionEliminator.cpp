@@ -234,8 +234,8 @@ void CSECodeGenerator::addDependencies(Id _c)
 	}
 	if (expr.item && expr.item->type() == Operation && (
 		expr.item->instruction() == Instruction::SLOAD ||
-		expr.item->instruction() == Instruction::MLOAD ||
-		expr.item->instruction() == Instruction::KECCAK256
+		expr.item->instruction() == Instruction::MLOAD
+//		expr.item->instruction() == Instruction::KECCAK256
 	))
 	{
 		// this loads an unknown value from storage or memory and thus, in addition to its
