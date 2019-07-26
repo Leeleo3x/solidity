@@ -97,6 +97,7 @@ void ExpressionCompiler::appendStateVariableAccessor(VariableDeclaration const& 
 
 	// retrieve the position of the variable
 	auto const& location = m_context.storageLocationOfVariable(_varDecl);
+	m_context << Instruction::STOREBEGIN;
 	m_context << location.first << u256(location.second);
 
 	TypePointer returnType = _varDecl.annotation().type;
@@ -217,6 +218,7 @@ void ExpressionCompiler::appendStateVariableAccessor(VariableDeclaration const& 
 			errinfo_comment("Stack too deep.")
 		);
 	m_context << dupInstruction(retSizeOnStack + 1);
+  	m_context << Instruction::STOREEND;
 	m_context.appendJump(eth::AssemblyItem::JumpType::OutOfFunction);
 }
 
@@ -1539,6 +1541,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 		if (keyType->isDynamicallySized())
 		{
 			_indexAccess.indexExpression()->accept(*this);
+			m_context << Instruction::STOREBEGIN;
 			utils().fetchFreeMemoryPointer();
 			// stack: base index mem
 			// note: the following operations must not allocate memory!
@@ -1552,6 +1555,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 		}
 		else
 		{
+		  	m_context << Instruction::STOREBEGIN;
 			m_context << u256(0); // memory position
 			appendExpressionCopyToMemory(*keyType, *_indexAccess.indexExpression());
 			m_context << Instruction::SWAP1;
@@ -1561,6 +1565,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 		}
 		m_context << Instruction::KECCAK256;
 		m_context << u256(0);
+		m_context << Instruction::STOREEND;
 		setLValueToStorageItem(_indexAccess);
 	}
 	else if (baseType.category() == Type::Category::Array)
@@ -1574,6 +1579,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 		switch (arrayType.location())
 		{
 		case DataLocation::Storage:
+		  	m_context << Instruction::STOREBEGIN;
 			ArrayUtils(m_context).accessIndex(arrayType);
 			if (arrayType.isByteArray())
 			{
@@ -1582,6 +1588,7 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 			}
 			else
 				setLValueToStorageItem(_indexAccess);
+			m_context << Instruction::STOREEND;
 			break;
 		case DataLocation::Memory:
 			ArrayUtils(m_context).accessIndex(arrayType);

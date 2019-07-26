@@ -177,6 +177,8 @@ std::map<std::string, Instruction> const dev::eth::c_instructions =
 static std::map<Instruction, InstructionInfo> const c_instructionInfo =
 { //												Add, Args, Ret, SideEffects, GasPriceTier
 	{ Instruction::STOP,		{ "STOP",			0, 0, 0, true,  Tier::Zero } },
+	{ Instruction::STOREBEGIN,		{ "STOREBEGIN",			0, 0, 0, true,  Tier::Zero } },
+	{ Instruction::STOREEND,		{ "STOREEND",			0, 0, 0, true,  Tier::Zero } },
 	{ Instruction::ADD,			{ "ADD",			0, 2, 1, false, Tier::VeryLow } },
 	{ Instruction::SUB,			{ "SUB",			0, 2, 1, false, Tier::VeryLow } },
 	{ Instruction::MUL,			{ "MUL",			0, 2, 1, false, Tier::Low } },
