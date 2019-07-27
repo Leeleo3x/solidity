@@ -270,7 +270,9 @@ bool ExpressionCompiler::visit(Assignment const& _assignment)
 
 	_assignment.leftHandSide().accept(*this);
 	solAssert(!!m_currentLValue, "LValue not retrieved.");
-
+	if (dynamic_cast<const IndexAccess *>(&_assignment.leftHandSide())) {
+	  m_context << Instruction::STOREBEGIN;
+	}
 	if (op == Token::Assign)
 		m_currentLValue->storeValue(*rightIntermediateType, _assignment.location());
 	else  // compound assignment
@@ -307,6 +309,9 @@ bool ExpressionCompiler::visit(Assignment const& _assignment)
 				m_context << swapInstruction(itemSize + lvalueSize) << Instruction::POP;
 		}
 		m_currentLValue->storeValue(*_assignment.annotation().type, _assignment.location());
+	}
+	if (dynamic_cast<const IndexAccess *>(&_assignment.leftHandSide())) {
+	  m_context << Instruction::STOREEND;
 	}
 	m_currentLValue.reset();
 	return false;
@@ -872,6 +877,7 @@ bool ExpressionCompiler::visit(FunctionCall const& _functionCall)
 		case FunctionType::Kind::ArrayPush:
 		{
 			_functionCall.expression().accept(*this);
+			m_context << Instruction::STOREBEGIN;
 			solAssert(function.parameterTypes().size() == 1, "");
 			solAssert(!!function.parameterTypes()[0], "");
 			TypePointer paramType = function.parameterTypes()[0];
@@ -907,6 +913,7 @@ bool ExpressionCompiler::visit(FunctionCall const& _functionCall)
 				StorageItem(m_context, *paramType).storeValue(*type, _functionCall.location(), true);
 			else
 				StorageByteArrayElement(m_context).storeValue(*type, _functionCall.location(), true);
+			m_context << Instruction::STOREEND;
 			break;
 		}
 		case FunctionType::Kind::ArrayPop:
@@ -1565,8 +1572,8 @@ bool ExpressionCompiler::visit(IndexAccess const& _indexAccess)
 		}
 		m_context << Instruction::KECCAK256;
 		m_context << u256(0);
-		m_context << Instruction::STOREEND;
 		setLValueToStorageItem(_indexAccess);
+		m_context << Instruction::STOREEND;
 	}
 	else if (baseType.category() == Type::Category::Array)
 	{

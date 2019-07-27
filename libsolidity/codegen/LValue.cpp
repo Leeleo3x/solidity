@@ -163,9 +163,10 @@ StorageItem::StorageItem(CompilerContext& _compilerContext, Type const& _type):
 
 void StorageItem::retrieveValue(SourceLocation const&, bool _remove) const
 {
-  	if (m_dataType->isDynamicallySized()) {
-  	  m_context << Instruction::STOREBEGIN;
-  	}
+//  	if (m_dataType->category() == Type::Category::Mapping ||
+//  		m_dataType->category() == Type::Category::Array) {
+//  	  m_context << Instruction::STOREBEGIN;
+//  	}
 	// stack: storage_key storage_offset
 	if (!m_dataType->isValueType())
 	{
@@ -174,9 +175,10 @@ void StorageItem::retrieveValue(SourceLocation const&, bool _remove) const
 			m_context << Instruction::POP; // remove byte offset
 		else
 			m_context << Instruction::DUP2;
-		if (m_dataType->isDynamicallySized()) {
-		  m_context << Instruction::STOREEND;
-		}
+//	  if (m_dataType->category() == Type::Category::Mapping ||
+//		  m_dataType->category() == Type::Category::Array) {
+//		m_context << Instruction::STOREEND;
+//	  }
 		return;
 	}
 	if (!_remove)
@@ -225,18 +227,16 @@ void StorageItem::retrieveValue(SourceLocation const&, bool _remove) const
 			m_context << ((u256(0x1) << (8 * m_dataType->storageBytes())) - 1) << Instruction::AND;
 		}
 	}
-	if (m_dataType->isDynamicallySized()) {
-	  m_context << Instruction::STOREEND;
-	}
+//  if (m_dataType->category() == Type::Category::Mapping ||
+//	  m_dataType->category() == Type::Category::Array) {
+//	  m_context << Instruction::STOREEND;
+//	}
 }
 
 void StorageItem::storeValue(Type const& _sourceType, SourceLocation const& _location, bool _move) const
 {
 	CompilerUtils utils(m_context);
 	solAssert(m_dataType, "");
-	if (m_dataType->isDynamicallySized() && m_dataType->category() != Type::Category::StringLiteral) {
-	  m_context << Instruction::STOREBEGIN;
-	}
 	// stack: value storage_key storage_offset
 	if (m_dataType->isValueType())
 	{
@@ -375,9 +375,6 @@ void StorageItem::storeValue(Type const& _sourceType, SourceLocation const& _loc
 				InternalCompilerError()
 					<< errinfo_sourceLocation(_location)
 					<< errinfo_comment("Invalid non-value type for assignment."));
-	}
-	if (m_dataType->isDynamicallySized()) {
-	  m_context << Instruction::STOREEND;
 	}
 }
 
